@@ -1,0 +1,19 @@
+<li class="media">
+  {% if settings.enable_gravatars %}
+  <div class="media-left pull-left">
+    <a href="{{ comment.url }}">
+      <img class="media-object" src="//www.gravatar.com/avatar/{{ comment.email | remove: ' ' | strip_newlines | downcase | md5 }}" alt="{{ comment.author }}" style="width: 64px; height: 64px;">
+    </a>
+  </div>
+  {% endif %}
+  <div class="media-body">
+    {% capture comment_date %}{{ comment.created_at | date: format: 'article_short' }}{% endcapture %}
+    <ul class="sinlge-post-meta">
+      <li><i class="fa fa-user"></i>{{ comment.author | remove: 'By'}}</li>
+      <li><i class="fa fa-clock-o"></i>{{ comment.created_at | date: '%r'}}</li>
+      <li><i class="fa fa-calendar"></i>{{ comment.created_at | date: comment_date }}</li>
+    </ul>
+     {{ comment.content }}
+  </div>
+
+</li>

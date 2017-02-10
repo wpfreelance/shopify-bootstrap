@@ -1,0 +1,13 @@
+{% if settings.hide_pricing != true or p.price > 0 %}
+<div class="product-price">
+  {% if p.price_varies %}
+    {% capture price %}{% assign show_zero = true %}{% include '_price' with p.price_min %}{% endcapture %}
+    {% capture price_with_currency %}{% assign show_zero = true %}{% include '_price_with_currency' with p.price_min %}{% endcapture %}
+    {{ 'products.price.from_price_html' | t: price: price, price_with_currency: price_with_currency }}
+  {% else %}
+    {% capture price %}{% assign show_zero = true %}{% include '_price' with p.price %}{% endcapture %}
+    {% capture price_with_currency %}{% assign show_zero = true %}{% include '_price_with_currency' with p.price %}{% endcapture %}
+    {{ 'products.price.standard_price_html' | t: price: price, price_with_currency: price_with_currency }}
+  {% endif %}
+</div>
+{% endif %}

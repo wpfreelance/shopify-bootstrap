@@ -1,0 +1,20 @@
+{% assign image = false %}
+{% assign content = page.content %}
+{% if settings.enable_page_banner and content contains 'src=' %}
+  {% include 'page_banner' %}
+{% endif %}
+
+<article class="sheet">
+  {% unless settings.show_page_title_on_banner and image %}
+  <div class="wpf-page-header features_items">
+    <h2 class="title text-center">
+    {{ page.title }}
+   </h2>
+ </div>
+  
+  {% endunless %}
+
+  <section class="sheet-content">
+    {{ content }}
+  </section>
+</article>

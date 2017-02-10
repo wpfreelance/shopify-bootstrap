@@ -1,0 +1,17 @@
+{% capture search_title %}{{ 'search.advanced_layout.title_html' | t: shop_name: shop.name }}{% endcapture %}
+{% capture search_description %}{{ 'search.advanced_layout.description_html' | t }}{% endcapture %}
+
+<div class="sheet">
+  {% unless search_title == blank %}
+  <header class="sheet-header page-header">
+    <h3>{{ search_title }}</h3>
+    {% unless search_description == blank %}<p>{{ search_description }}</p>{% endunless %}
+  </header>
+  {% endunless %}
+  <div class="search-lg">
+    {% assign form_classes = 'search-form' %}
+    {% assign form_size = 'lg' %}
+    {% assign override_enabled_setting = true %}
+    {% include 'search_form' %}
+  </div>
+</div>

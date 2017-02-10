@@ -1,0 +1,6 @@
+{% comment TODO: On-boarding %}{% endcomment %}
+
+{% assign advanced_layout_section_object = pages['frontpage'] %}
+{% assign advanced_layout_section_id = advanced_layout_section_object.handle %}
+{% capture advanced_layout_section_content %}{% include 'advanced_layout_page' with advanced_layout_section_object %}{% endcapture %}
+{% include 'advanced_layout_section' %}

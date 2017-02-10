@@ -1,0 +1,22 @@
+{% assign product_description_sections = null %}
+{% assign parts = product_description | split: '<h2' %}
+{% if parts.size > 1 and settings.product_content_layout != 'standard' %}
+  {% case settings.product_content_layout %}
+  {% when 'tabs' %}
+    {% include 'content_tabs' with product_description %}
+    {% if content_tabs_description %}
+      <div itemprop="description">{{ content_tabs_description }}</div>
+    {% endif %}
+    {{ content_tabs_output }}
+    
+  {% when 'sections' %}
+    {% include 'content_sections' with product_description %}
+    {% if content_sections_description %}
+      <div itemprop="description">{{ content_sections_description }}</div>
+    {% endif %}
+    {% assign product_description_sections = content_sections_output %}
+    
+  {% endcase %}
+{% else %}
+  <div itemprop="description">{{ product_description }}</div>
+{% endif %}

@@ -1,0 +1,64 @@
+<div class="header-middle"><!--header-middle-->
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="logo pull-left">
+          <a class="" href="/" title="{{ shop.name }}">
+          {% if settings.logo_enabled %}
+            <img id = "brand-logo" class="logo-image" src="{{ 'logo.png' | asset_url }}" alt="{{ shop.name | escape }}">
+          {% else %}
+            <h3>{{ shop.name }}</h3>
+          {% endif %}
+          </a>
+        </div>
+        <!--<div class="btn-group pull-right">
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle usa" data-toggle="dropdown">
+              USA
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#">Canada</a></li>
+              <li><a href="#">UK</a></li>
+            </ul>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle usa" data-toggle="dropdown">
+              DOLLAR
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#">Canadian Dollar</a></li>
+              <li><a href="#">Pound</a></li>
+            </ul>
+          </div>
+        </div>-->
+      </div>
+      <div class="col-sm-8">
+        <div class="shop-menu pull-right">
+            <ul class="nav navbar-nav" id="wpf-right-menu">
+              {% if shop.customer_accounts_enabled %}
+              {% if customer %}
+                <li class="dropdown"><a href="#"><i class="fa fa-user"></i>Hi ! {{customer.first_name}}<i class="fa fa-angle-down"></i></a>
+                   <ul class="wpf-sub-menu">
+                     <li><a href="/account"><i class="fa fa-user"></i>Account</a></li>
+                     <li><a href="#"><i class="fa fa-star"></i> Wishlist</a></li>
+                     <li><a href="/account/logout"><i class="fa fa-lock"></i> Logout</a></li>
+                   </ul>
+                </li>
+              {% else %}
+                <li><a href="/account/login"><i class="fa fa-unlock-alt"></i> Login</a></li>
+              {% endif %}
+              {% endif %}
+
+              <li><a href="/checkout"><i class="fa fa-crosshairs"></i> Checkout</a></li>
+              {% capture cart_total_price %}{% include '_price' with cart.total_price %}{% endcapture %}
+              {% capture cart_total_price_with_currency %}{% include '_price_with_currency' with cart.total_price %}{% endcapture %}
+              <li><a href="/cart" data-cart-display>{{ 'cart.site_header.cart_link_html' | t: item_count: cart.item_count, cart_total_price: cart_total_price, cart_total_price_with_currency: cart_total_price_with_currency }}</a></li>
+            </ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</div><!--/header-middle-->

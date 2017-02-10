@@ -1,0 +1,23 @@
+<div class="post-meta">
+  <ul>
+    {% capture date %}{{ article.published_at | date: format: 'article_short' }}{% endcapture %}
+    {% if settings.blog_show_author %}
+      <li>
+        <i class="fa fa-user"></i>{{ 'blog.article_list.author_html' | t: author: article.author | remove: 'By'}}
+      </li>
+    {% endif %}
+      <li><i class="fa fa-clock-o"></i>{{ article.published_at | date: "%r" }}</li>
+      <li><i class="fa fa-calendar"></i>{{ 'blog.article_list.published_date_html' | t: date: date | remove: 'Published on' }}</li>
+      {% if article.tags.size > 0 %}
+      {% capture tags %}{% for tag in article.tags %}{{ tag | link_to_tag: tag }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+      <li><i class="fa fa-tags"></i>{{ 'blog.article_list.tags_html' | t: tags: tags }}</li>
+      {% endif %}
+      {% if article.comments_enabled? %}
+      {% capture comments_link %}<a href="{{ article.url }}#comments">{{ 'blog.article_list.comments_link' | t: count: article.comments_count }}</a>{% endcapture %}
+      <li><i class="fa fa-comment"></i>{{ 'blog.article_list.comments_html' | t: comments_link: comments_link }}</li>
+      {% endif %}
+  </ul>
+  {%comment%}
+  {% include 'article_social_share_links' %}
+  {%endcomment%}
+</div>

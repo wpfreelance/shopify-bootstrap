@@ -1,0 +1,9 @@
+{% if collection.all_products_count > 0 %}
+  <div class="collection-controls clearfix">
+    {% include 'collection_controls_template_switcher' %}
+    {% include 'collection_controls_sort_by' %}
+    {%comment%}
+    {% include 'collection_controls_filter_by' %}
+    {%endcomment%}
+  </div>
+{% endif %}

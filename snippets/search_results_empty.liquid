@@ -1,0 +1,36 @@
+<section class="sheet-content clearfix">
+  <div class="search-lg">
+    {% assign form_classes = 'search-form' %}
+    {% assign form_size = 'lg' %}
+    {% assign override_enabled_setting = true %}
+    {% include 'search_form' %}
+  </div>
+  {% if message_title or message_html %}
+  <div class="search-message text-center">
+    <div class="search-message-content">
+      {% if message_title %}<h3>{{ message_title }}</h3>{% endif %}
+      {% if message_html %}<h3 class="scr-res">{{ message_html }}</h3>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+
+{% if settings.search_collection %}
+  {% assign collection = collections[settings.search_collection] %}
+  <h2>{{ collection.title }}</h2>
+
+  {% include 'pagination_limit' with 'products' %}
+  {% assign collection_all_size = collection.all_products.size %}
+  {% if settings.show_product_variants_as_items %}
+    {% assign collection_all_size = collection.all_products | map: 'variants' | map: 'title' | size %}
+  {% endif %}
+  {% if collection_all_size < pagination_limit %}{% assign collection_size = collection_all_size %}{% else %}{% assign collection_size = pagination_limit %}{% endif %}
+  <section class="group products" data-products-size="{{ collection_all_size }}">
+    {% for p in collection.products limit: pagination_limit %}
+      {% include 'product_item' %}
+    {% endfor %}
+  </section>
+{% endif %}
+
+{% assign message_title = null %}
+{% assign message_html = null %}

@@ -1,0 +1,216 @@
+{% if settings.show_product_variants_as_items and show_product_only != true %}
+  {% for v in p.variants %}
+    {% assign output_variant = true %}
+    {% if product_limit_counter != blank %}
+      {% assign product_limit_counter = product_limit_counter | plus: 1 %}
+      {% if product_limit_counter > product_limit %}
+        {% assign output_variant = false %}
+      {% endif %}
+    {% endif %}
+
+    {% if output_variant %}
+      {% comment note: Check if the product is on sale and set a variable to be used below. %}{% endcomment %}
+      {% assign on_sale = false %}
+      {% if v.compare_at_price > v.price %}
+        {% assign on_sale = true %}
+      {% endif %}
+
+      {% comment note: Check if the product is sold out and set a variable to be used below. %}{% endcomment %}
+      {% assign sold_out = true %}
+      {% if v.available  %}
+        {% assign sold_out = false %}
+      {% endif %}
+
+      {% capture v_title %}{{ p.title | escape }} &mdash; {{ v.title | escape }}{% endcapture %}
+
+
+      <div class="group-item-wrap">
+
+        <div class="product-image-wrapper">
+          <div class="single-products">
+            {% assign item_url = v.url %}
+            {% if collection %}
+              {% assign item_url = v.url | within: collection %}
+            {% endif %}
+              <div class="productinfo text-center">
+                {% if v.image or p.featured_image %}
+                  {% capture img_size %}{% if collection_size > 1 %}1024x1024{% else %}2048x2048{% endif %}{% endcapture %}
+                  {% if v.image %}
+                  <div class="pro-img">
+                    {{ v.image | img_url: img_size | img_tag: v_title }}
+                  </div>
+                  {% else %}
+                    <div class="pro-img">
+                    {{ p.featured_image | img_url: img_size | img_tag: v_title }}
+                  </div>
+                  {% endif %}
+                {% else %}
+                  <div class="fallback-image"></div>
+                {% endif %}
+                <h2>{% include 'product_price' %}</h2>
+
+                <p>{{ v_title }}</p>
+                {% if sold_out != true %}
+                <form action="/cart/add" method="post" class="variants" id="product-actions" enctype="multipart/form-data" style="padding:0px;">
+                   <div style="display:none;">
+                     <select id="product-select" name="id">
+                     {% for v in p.variants %}
+                     <option value="{{ v.id }}">
+                       {{ v.title | escape }} - {{ v.price | money }}
+                     </option>
+                     {% endfor %}
+                     </select>
+                   </div>
+                   <a href="{{ item_url }}" class="btn btn-default add-to-cart"><i class="fa fa-info-circle"></i>View Details</a>
+                   <button class="btn btn-default add-to-cart" type="submit" name="add" id="add-to-cart" value="Add to Cart">
+                      <i class="fa fa-shopping-cart"></i>
+                      Add to cart
+                   </button>
+                 </form>
+                 {% endif %}
+                 {% include 'product_badges_wpf' %}
+              </div>
+              <div class="product-overlay">
+                <div class="overlay-content">
+                  <h2>{% include 'product_price' %}</h2>
+                  <span class="shopify-product-reviews-badge" data-id="{{ p.id }}"></span>
+
+                  <p>{{ v_title }}</p>
+                  <a href="{{ item_url }}" class="btn btn-default add-to-cart"><i class="fa fa-info-circle"></i>View Details</a>
+                  {% if sold_out != true %}
+                   <form action="/cart/add" method="post" class="variants" id="product-actions" enctype="multipart/form-data" style="padding:0px;">
+                      <div style="display:none;">
+                        <select id="product-select" name="id">
+                        {% for v in p.variants %}
+                        <option value="{{ v.id }}">
+                          {{ v.title | escape }} - {{ v.price | money }}
+                        </option>
+                        {% endfor %}
+                        </select>
+                      </div>
+
+                      <button class="btn btn-default add-to-cart" type="submit" name="add" id="add-to-cart" value="Add to Cart">
+                         <i class="fa fa-shopping-cart"></i>
+                         Add to cart
+                      </button>
+                   </form>
+
+                  {%else%}
+                  {% include 'product_badges_wpf' %}
+                  <span class="shopify-product-reviews-badge" data-id="{{ p.id }}"></span>
+                  {% endif %}
+                </div>
+              </div>
+          </div>
+          <div class="choose">
+            <ul class="nav nav-pills nav-justified">
+              <li><a href="#"><i class="fa fa-plus-square"></i>Wishlist</a></li>
+              <li><a href="#"><i class="fa fa-plus-square"></i>Compare</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!---group-item-wrap -->
+
+
+
+
+    {% endif %}
+  {% endfor %}
+
+{% else %}
+  {% comment note: Check if the product is on sale and set a variable to be used below. %}{% endcomment %}
+  {% assign on_sale = false %}
+  {% if p.compare_at_price > p.price %}
+    {% assign on_sale = true %}
+  {% endif %}
+
+  {% comment note: Check if the product is sold out and set a variable to be used below. %}{% endcomment %}
+  {% assign sold_out = true %}
+  {% if p.available  %}
+    {% assign sold_out = false %}
+  {% endif %}
+
+  {% assign p_title = p.title | escape %}
+
+  <div class="group-item-wrap">
+
+    <div class="product-image-wrapper">
+      <div class="single-products">
+        {% assign item_url = p.url %}
+        {% if collection %}
+          {% assign item_url = p.url | within: collection %}
+        {% endif %}
+          <div class="productinfo text-center">
+            {% if p.featured_image %}
+              {% capture img_size %}{% if collection_size > 1 %}1024x1024{% else %}2048x2048{% endif %}{% endcapture %}
+              <div class="pro-img">
+              {{ p.featured_image | img_url: img_size | img_tag: p_title }}
+             </div>
+            {% else %}
+              <div class="fallback-image"></div>
+
+            {% endif %}
+            <h2>{% include 'product_price' %}</h2>
+            <p>{{ p.title }}</p>
+            {% if sold_out != true %}
+            <form action="/cart/add" method="post" class="variants" id="product-actions" enctype="multipart/form-data" style="padding:0px;">
+               <div style="display:none;">
+                 <select id="product-select" name="id">
+                 {% for v in p.variants %}
+                 <option value="{{ v.id }}">
+                   {{ v.title | escape }} - {{ v.price | money }}
+                 </option>
+                 {% endfor %}
+                 </select>
+               </div>
+               <a href="{{ item_url }}" class="btn btn-default add-to-cart"><i class="fa fa-info-circle"></i>View Details</a>
+               <button class="btn btn-default add-to-cart" type="submit" name="add" id="add-to-cart" value="Add to Cart">
+                  <i class="fa fa-shopping-cart"></i>
+                  Add to cart
+               </button>
+             </form>
+             {% endif %}
+             <h2>{% include 'product_badges' %}</h2>
+             <span class="shopify-product-reviews-badge" data-id="{{ p.id }}"></span>
+          </div>
+          <div class="product-overlay">
+            <div class="overlay-content">
+              <h2>{% include 'product_price' %}</h2>
+              <p>{{ p.title }}</p>
+              <a href="{{ item_url }}" class="btn btn-default add-to-cart"><i class="fa fa-info-circle"></i>View Details</a>
+              {% if sold_out != true %}
+               <form action="/cart/add" method="post" class="variants" id="product-actions" enctype="multipart/form-data" style="padding:0px;">
+                  <div style="display:none;">
+                    <select id="product-select" name="id">
+                    {% for v in p.variants %}
+                    <option value="{{ v.id }}">
+                      {{ v.title | escape }} - {{ v.price | money }}
+                    </option>
+                    {% endfor %}
+                    </select>
+                  </div>
+
+                  <button class="btn btn-default add-to-cart" type="submit" name="add" id="add-to-cart" value="Add to Cart">
+                     <i class="fa fa-shopping-cart"></i>
+                     Add to cart
+                  </button>
+               </form>
+               {%else%}
+               <h2>{% include 'product_badges' %}</h2>
+               <span class="shopify-product-reviews-badge" data-id="{{ p.id }}"></span>
+               {% endif %}
+            </div>
+          </div>
+      </div>
+      <div class="choose">
+        <ul class="nav nav-pills nav-justified">
+          <li><a href="#"><i class="fa fa-plus-square"></i>Wishlist</a></li>
+          <li><a href="#"><i class="fa fa-plus-square"></i>Compare</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!---group-item-wrap -->
+{% endif %}
+{% assign show_product_only = null %}

@@ -1,0 +1,33 @@
+{% comment Note:
+
+  Takes a block of content, separates out the images from the text and then wraps
+  them in markup so that they can be displayed in columns side by side.
+
+ %}{% endcomment %}
+ 
+{% if content_split contains 'src=' %}
+    {% assign image_size = 'grande' %}
+  {% include '_extract_images' with content_split %}
+  
+  {% assign content = content_split %}
+  {% for image in unsized_images %}
+    {% assign content = content | remove: image %}
+  {% endfor %}
+  {% assign content = content | remove: '<p></p>' %}
+   
+  {% comment note: Output content %}{% endcomment %}
+  <div class="content-split">
+    <div class="content-split-text">
+      {{ content }}
+    </div>
+    <div class="content-split-images">
+      {% for image in images %}
+        {{ image }}
+      {% endfor  %}
+    </div>
+  </div>
+{% else %}
+  <div class="content-full">
+    {{ content_split }}
+  </div>
+{% endif %}

@@ -1,0 +1,50 @@
+<div class="header-bottom"><!--header-bottom-->
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="mainmenu pull-left">
+          <!-- Display linklist selected in theme settings. -->
+                  {% unless linklists[settings.navbar_linklist] == empty %}
+                  <ul class="nav navbar-nav collapse navbar-collapse">
+                    {% for link in linklists[settings.navbar_linklist].links %}
+
+                      <!-- Check to see if this menu item has a child menu. -->
+                      {% capture child_list_handle %}{{ link.title | handle }}{% endcapture %}
+                      {% if linklists[child_list_handle] and linklists[child_list_handle].links.size > 0 %}{% assign has_dropdown = true %}{% else %}{% assign has_dropdown = false %}{% endif %}
+
+                      <li class="{% if link.active %}active{% endif %} {% if has_dropdown %}dropdown{% endif %}">
+                        <a href="{{ link.url }}" {% if has_dropdown %}class="dropdown-toggle" data-hover="dropdown" data-delay="200" data-toggle="dropdown"{% endif %}>
+                          {{ link.title }}
+                          {% if has_dropdown %}
+                          <i class="fa fa-angle-down"></i>
+                          {% endif %}
+                        </a>
+                        {% if has_dropdown %}
+                          <ul class="sub-menu" role="menu">
+                            {% for child_link in linklists[child_list_handle].links %}
+                              <li><a href="{{ child_link.url }}">{{ child_link.title }}</a></li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+            {% endunless %}
+        </div>
+      </div>
+      <div class="col-sm-3">
+        {% assign form_classes = 'search_box pull-right' %}
+        {% include 'search_form' %}
+
+      </div>
+    </div>
+  </div>
+</div><!--/header-bottom-->

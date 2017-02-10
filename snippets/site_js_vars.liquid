@@ -1,0 +1,103 @@
+<script>
+  /*
+    We use a JS object similar to Shopify's to contain our custom methods for working with this theme
+    All of our JS is done within our seperate source files so that we can use our build tools with them.
+    
+    However we need certain information from Shopify that we can only grab from the liquid, so we set everything up here for later use.
+  */
+  
+  // Setup our base javascript object
+  var Bsify = Bsify || {};
+  
+  Bsify.selectors = {};
+  Bsify.translations = {};
+  
+  /*
+    Cart
+  */
+  Bsify.cart = {{ cart | json }};
+  // Cart item selectors
+  Bsify.selectors.cart = {
+    form_selector: ".cart-form",
+    item_selector: ".cart-item",
+    item_price_selector: ".cart-item-price .money",
+    item_total_selector: ".cart-item-total .money",
+    message_selector: '.cart-message',
+    acknowledgement_checkbox: '.acknowledgement-checkbox'
+  };
+  // Cart item translations
+  {% capture price %}{% include '_price' with '[cart_total_price]' %}{% endcapture %}
+  {% capture price_with_currency %}{% include '_price_with_currency' with '[cart_total_price_with_currency]' %}{% endcapture %}
+  Bsify.translations.cart = {
+    cart_total: "{{ 'cart.price.cart_total_html' | t: price: price, price_with_currency: price_with_currency | replace: '"',"'" | strip_newlines }}",
+    cart_display_text: "{{ 'cart.site_header.cart_link_html' | t: item_count: '[item_count]', cart_total_price: price, cart_total_price_with_currency: price_with_currency | replace: '"',"'" | strip_newlines }}",
+    empty_cart_text: "{{ 'cart.cart_page.empty_message_html' | t | replace: '"',"'" | strip_newlines }}",
+    remove_item_message: "{{ 'cart.cart_table.remove_item_message_html' | t: item_title: '[item_title]' | replace: '"',"'" | strip_newlines }}",
+    remove_item_error_message: "{{ 'cart.cart_table.remove_item_error_message_html' | t: item_title: '[item_title]', error_message: '[error_message]' | replace: '"',"'" | strip_newlines }}",
+    acknowledgement_checkbox_error_message: "{{ 'cart.acknowledgement_checkbox.error' | t | replace: '"',"'" | strip_newlines }}"
+  };
+  
+  /*
+    Product
+  */
+  {% assign product_json = product | json %}
+  Bsify.product = {{ product_json }};
+  {% if product_json %}
+  
+  // Selectors for elements.
+  // Make sure to update these if you change any markup
+  Bsify.selectors.product = {
+    select_selector: '.product-select',
+    form_selector: '.add-to-cart-form',
+    form_message_selector: '.add-to-cart-message'
+  };
+  
+  // Product translations
+  Bsify.translations.product = {
+    unavailable_button_text: "{{ 'products.buttons.unavailable' | t }}",
+    add_to_cart_button_text: "{{ 'products.buttons.add_to_cart' | t }}",
+    added_to_cart_button_text: "{{ 'products.buttons.added_to_cart' | t }}",
+    adding_to_cart_button_text: "{{ 'products.buttons.adding_to_cart' | t }}",
+    add_another_button_text: "{{ 'products.buttons.add_another' | t }}",
+    sold_out_button_text: "{{ 'products.buttons.sold_out' | t }}",
+    after_product_added_message_html: "{{ 'products.form.after_product_added_message_html' | t: item_title: '[item_title]', collection_url: '[collection_url]' | replace: '"',"'" | strip_newlines }}",
+    after_product_added_error_message_html: "{{ 'products.form.after_product_added_message_html' | t: item_title: '[item_title]', error_message: '[error_message]' | replace: '"',"'" | strip_newlines }}",
+    item_title_seperator: "{{ 'products.form.item_title_seperator' | t }}"
+  };
+  {% endif %}
+  
+  /*
+    Misc
+  */
+  
+  // Money formats
+  Bsify.money_formats = {
+    "moneyFormat": "{{ shop.money_format }}",
+    "moneyWithCurrencyFormat": "{{ shop.money_with_currency_format }}"
+  };
+  
+  // Functionality flags - this just sets if we want to use some of these things.
+  // If you don't want them then just set them to false
+  Bsify.ajax_add_to_cart = true;
+  Bsify.linked_product_options = true; // links product options selectors so as to not show unavilble products on a products page
+  
+  // Time that any message created by the cart is visble for before being removed
+  Bsify.message_timeout = 15000; // 15 secs
+
+  /*
+    Thumbnail settings
+    - You can override the Bsify.thumbnail_selectors object by calling it first inside the theme settings header custom code area.
+      It must conatin a selector for the thumbnail image wrapper and the details/caption wrapper
+  */
+  Bsify.thumbnail_settings = {
+    constrain_images: {{ settings.thumbnail_images_constrained | json }},
+    crop_images: {{ settings.thumbnail_images_cropped | json }},
+    image_ratio: "{{ settings.thumbnail_images_ratio }}",
+    image_alignment: "{{ settings.thumbnail_images_alignment }}"
+  };
+  Bsify.thumbnail_selectors = Bsify.thumbnail_selectors || {
+    image_wrapper: '.group-item-image:not(.collection-lookbook .group-item-image):not(.group-item-list .group-item-image), .uniform-thumbs',
+    details_wrapper: '.group-item-details:not(.group-item-list  .group-item-details), .orderly'
+  };
+
+</script>

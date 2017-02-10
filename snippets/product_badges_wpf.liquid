@@ -1,0 +1,7 @@
+{% if on_sale and sold_out != true %}<span class="label label-sale label-success">{{ 'products.badges.on_sale' | t }}</span>{% endif %}
+{% if sold_out %}<button class="btn btn-default add-to-cart sold-out">
+  <i class="fa fa-info-circle"></i>
+  {{ 'products.badges.sold_out' | t }}
+
+</button>
+{% endif %}

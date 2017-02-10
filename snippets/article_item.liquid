@@ -1,0 +1,34 @@
+{% if settings.truncate_article_results == blank %}
+  {% assign content = article.excerpt_or_content %}
+{% else %}
+  {% assign content = article.excerpt_or_content | strip_html | truncatewords: settings.truncate_article_results %}
+{% endif %}
+
+<div class="list-item-wrap">
+  <article class="list-item blog-article">
+    <header class="page-header">
+      <a href="{{ article.url }}">
+      {% if settings.enable_article_list_banners %}
+        {% assign image_size = '2048x2048' %}
+        {% if article.image %}
+          {{ article | img_url: image_size | img_tag: article.title }}
+        {% elsif content contains 'src=' %}
+          {% include '_extract_images' with article.content %}
+          {% assign image = images | first %}
+          {% assign image_to_remove = unsized_images | first %}
+          {% assign content = content | remove: image_to_remove %}
+          {{ image }}
+        {% endif %}
+      {% endif %}
+      </a>
+      <h1 class="blog-header">
+        <a href="{{ article.url }}">{{ article.title }}</a>
+      </h1>
+      {% include 'article_meta' %}
+    </header>
+    <section class="blog-article-content">
+      {{ content }}
+    </section>
+    <a class="btn btn-primary" href="{{ article.url }}">Read More</a>
+  </article>
+</div>

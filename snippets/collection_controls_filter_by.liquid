@@ -1,0 +1,86 @@
+{% comment note:
+
+  Collection Filter by Tags
+  link_to_tag url filter will take into account the sort order and view url params
+  
+  Tags can be set as compounding or not.
+  Tags can be viewed as dropdowns or a tag list.
+  
+  Group tags into a new filter by using this syntax `group:tag`
+  If a tag group only contains one tag and all the products in the collection has that tag then it won't be shown. <-- TODO
+  
+ %}{% endcomment %}
+ 
+{% if settings.show_collection_filter_by %}
+
+  {% if current_tags.size > 0 %}
+    <div class="collection-clear-all">
+      <ul class="nav nav-pills">
+        <li><a href="{% if collection.url != blank %}{{ collection.url }}{% else %}/collections/all{% endif %}">{{ 'collections.filtering.clear_all_filters' | t }}</a></li>
+      </ul>
+    </div>
+  {% endif %}
+  
+  {% if collection.all_tags.size > 0 %}
+    {% comment note: Group tags
+       Collect group names from each tag.
+       We have to loop the collected tag groups to check if it contains the current tag otherwise we get an issue where 'group' is not included if 'grouping' comes before it. 
+     %}{% endcomment %}
+     
+    {% capture tag_groups %}TAGS{% endcapture %}
+    {% assign hidden_tag_groups = settings.hidden_tag_group_list | downcase | split: ',' %}
+    {% for tag in collection.all_tags %}
+      {% if tag contains ':' %}
+        {% assign group_name = tag | split: ':' | first %}
+        {% assign group_name_lower = group_name | downcase %}
+        
+        {% unless hidden_tag_groups contains group_name_lower %}
+          {% assign is_in_tag_groups = false %}
+          {% assign group_names = tag_groups | downcase | split: '|' %}
+          {% if group_names contains group_name_lower %}
+            {% assign is_in_tag_groups = true %}
+          {% endif %}
+          
+          {% unless is_in_tag_groups %}
+            {% capture tag_groups %}{{ tag_groups }}|{{ group_name }}{% endcapture %}
+          {% endunless %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  
+    <div class="collection-filter-by collection-filter-style-{{ settings.filter_by_tag_style }}">
+    {% assign tag_groups = tag_groups | split: '|' %}
+    {% for tag_group in tag_groups %}
+      {% assign has_tag_group = false %}
+      {% unless tag_group == 'TAGS' %}
+        {% assign has_tag_group = true %}
+      {% endunless %}
+      
+      {% capture tags %}{% include 'collection_controls_filter_by_tag_group' %}{% endcapture %}
+      {% capture tag_group_title %}{% if has_tag_group %}{{ 'collections.filtering.filter_by_group_title' | t: group: tag_group }}{% else %}{{ 'collections.filtering.filter_by_title' | t }}{% endif %}{% endcapture %}
+      {% unless tags == blank %}
+        <div class="collection-filter-by-tags{% if has_tag_group %} collection-filter-group-{{ tag_group }}{% endif %}">
+        {% case settings.filter_by_tag_style %}
+        {% when 'dropdown' %}
+          <ul class="nav nav-pills">
+            <li class="dropdown{% if tag_group_contains_active_tags %} active{% endif %}">
+              <a class="dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">{{ tag_group_title }} <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                {{ tags }}
+              </ul>
+            </li>
+          </ul>
+          
+        {% when 'button' %}
+          <ul class="nav nav-pills">
+            <li><strong>{{ tag_group_title }}:</strong></li>
+            {{ tags }}
+          </ul>
+          
+        {% endcase %}
+        </div>
+      {% endunless %}
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}

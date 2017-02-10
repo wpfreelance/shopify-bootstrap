@@ -1,0 +1,21 @@
+<div class="response-area">
+  <h2>{{article.comments_count}} {{ 'blog.comments.title' | t }}</h2>
+  {% if article.comments.size > 0 %}
+    {% include 'pagination_limit' with 'comments' %}
+    {% paginate article.comments by pagination_limit %}
+
+      <ul class="media-list">
+      {% for comment in article.comments %}
+        {% include 'article_comment' %}
+      {% endfor %}
+      </ul>
+
+      {% include 'pagination' %}
+    {% endpaginate %}
+  {% else %}
+    <p class="text-muted"><em>{{ 'blog.comments.no_comments_message' | t }}</em></p>
+  {% endif %}
+
+</div><!--/Response-area-->
+
+{% include 'article_comments_form' %}

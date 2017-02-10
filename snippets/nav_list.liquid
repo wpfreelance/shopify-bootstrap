@@ -1,0 +1,133 @@
+{% comment note:
+
+  The `nav_list` snippet takes a linklist handle as it's 'with' parameter. You can still create a `nav_list` without this parameter.
+  It also has several other optional variable parameters that are set outside the snippet before it is included.
+  These are:
+  
+  nav_classes:
+    `nav_classes` is set prior to including this snippet and is used for adding special/bootstrap/context classes to the nav.
+    A class of .nav will always be used and if nav_classes is not set before including then this will be the only class used.
+  
+  nav_list_items:
+    This is a comer separated list of extra items to include in this nav list. An option will only be used if it is included in the list.
+    options are:
+      `accounts`: Show user account links i.e. sign in / sign out / etc.
+      `cart`: Show the shopping cart link.
+      
+  include_dropdowns:
+    `include_dropdowns` is a boolean value and defaults to true. When it is enabled it will add a nested dropdown list to the nav.
+  
+ %}{% endcomment %}
+
+{% assign nav_classes = nav_classes | replace: ',',' ' | replace: '  ',' ' %}
+{% unless nav_classes contains 'nav ' %}
+  {% assign nav_classes = nav_classes | prepend: 'nav ' %}
+{% endunless %}
+
+{% if include_dropdowns == null %}{% assign include_dropdowns = true %}{% endif %}
+
+{% assign is_megamenu = false %}
+{% if settings.enable_megamenu and is_mobile != true %}
+  {% if has_menu %}
+    {% if nav_list == settings.main_menu_linklist %}
+      {% assign is_megamenu = true %}
+    {% endif %}
+  {% else %}
+    {% if nav_list == 'main-menu' %}
+      {% assign is_megamenu = true %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+<ul class="{{ nav_classes }}" id="{{ nav_list }}">
+  {% comment note: Create nav links from our linklist handel %}{% endcomment %}
+  {% for link in linklists[nav_list].links %}
+    {% assign child_list_handle = link.handle %}
+    {% if linklists[child_list_handle].links != blank and include_dropdowns and is_megamenu == false %}
+      {% assign has_active_child = false %}
+      {% capture dropdown %}
+        <ul class="dropdown-menu" role="menu">
+          {% comment note: childlink.active doesn't take filtered collection urls into count so use (faked) global page_url match %}{% endcomment %}
+          {% for childlink in linklists[child_list_handle].links %}
+          
+            {% assign is_active = false %}
+            {% if page_url %}
+              {% if childlink.url == page_url %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% else %}
+              {% if childlink.active %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% endif %}
+            {% if is_active %}
+              {% assign has_active_child = true %}
+            {% endif %}
+          
+            {% assign grandchild_list_handle = childlink.handle %}
+            {% assign grandchild_linklist = linklists[grandchild_list_handle] %}
+            {% if grandchild_linklist.links == blank %}
+              <li{% if is_active %} class="active"{% endif %}><a href="{{ childlink.url }}" title="{{ childlink.title | strip_html }}">{{ childlink.title }}</a></li>
+              
+            {% else %}
+              <li class="dropdown-header" title="{{ childlink.title | strip_html }}">{{ childlink.title }}</li>
+              {% for grandchildlink in grandchild_linklist.links %}
+                {% if childlink.active %}
+                  {% assign is_active = true %}
+                {% endif %}
+                <li{% if is_active %} class="active"{% endif %}><a href="{{ grandchildlink.url }}" title="{{ grandchildlink.title | strip_html }}">{{ grandchildlink.title }}</a></li>
+                {% assign is_active = false %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endcapture %}
+    
+      <li class="dropdown{% if has_active_child %} active{% endif %}">
+        <a class="dropdown-toggle" href="{{ link.url }}" data-toggle="dropdown">{{ link.title }} <span class="caret"></span></a>
+        {{ dropdown }}
+      </li>
+    {% elsif is_megamenu and linklists[child_list_handle].links != blank %}
+      <li><a class="mega-menu-collapse-action" href="{{ link.url }}" data-toggle="collapse" data-target="#{{ link.handle }}" aria-expanded="false" aria-controls="{{ link.handle }}" title="{{ link.title | strip_html }}" onclick="return false;">{{ link.title }} <span class="caret"></span></a></li>
+    {% else %}
+      <li{% if link.active %} class="active"{% endif %}><a href="{{ link.url }}" title="{{ link.title | strip_html }}">{{ link.title }}</a></li>
+    {% endif %}
+  {% endfor %}
+  
+  {% comment note: Show extra nav list items %}{% endcomment %}
+  {% assign extra_items = nav_list_items | split: ',' %}
+  {% for item in extra_items %}
+    {% case item %}
+    {% when 'accounts' %}
+      {% if shop.customer_accounts_enabled %}
+        {% if customer %}        
+          <li class="navigation-account">
+            <a href="/account">{{ 'customer_accounts.site_header.customer_account_link_html' | t: name: customer.first_name }}</a>
+          </li>
+          <li class="navigation-account">
+            {{ 'customer_accounts.site_header.customer_sign_out_link_html' | t | customer_logout_link }}
+          </li>
+        {% else %}
+          <li class="navigation-account">
+            {{ 'customer_accounts.site_header.customer_sign_in_link_html' | t | customer_login_link }}
+          </li>
+          <li class="navigation-account">
+            {{ 'customer_accounts.site_header.customer_register_link_html' | t | customer_register_link }}
+          </li>
+        {% endif %}
+      {% endif %}
+      
+    {% when 'cart' %}
+      {% capture cart_total_price %}{% include '_price' with cart.total_price %}{% endcapture %}
+      {% capture cart_total_price_with_currency %}{% include '_price_with_currency' with cart.total_price %}{% endcapture %}
+      <li class="navigation-cart"><a href="/cart" data-cart-display>{{ 'cart.site_header.cart_link_html' | t: item_count: cart.item_count, cart_total_price: cart_total_price, cart_total_price_with_currency: cart_total_price_with_currency }}</a></li>
+      
+    {% endcase %}
+  {% endfor %}
+</ul>
+
+{% comment note: unset optional variable parameters. Because sanity. %}{% endcomment %}
+{% assign nav_list_items = null %}
+{% assign nav_classes = null %}
+{% assign include_dropdowns = null %}
+{% assign is_mobile = null %}

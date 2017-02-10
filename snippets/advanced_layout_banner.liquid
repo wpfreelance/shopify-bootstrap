@@ -1,0 +1,127 @@
+{% comment note:
+
+  Banner Global Settings
+    - Transition Speed
+    - Transition type (fade|slide)
+    - Auto play (?)
+
+  Banner individual settings
+   - Active
+
+   - Image
+
+   - Size
+    - 'Full screen' (accounts for screen height)
+    - full width
+    - container width
+    - half container width - left
+    - half container width - right
+
+  - Caption position
+   - Left
+   - Center
+   - Right
+
+  - Caption heading text
+  - Caption description text
+  - Caption 'call to action' button text
+
+  - Caption text colour
+  - Button colour
+  - banner background colour
+
+ %}{% endcomment %}
+
+{% unless banner_id %}
+  {% assign banner_id = 'homepage-carousel-1' %}
+{% endunless %}
+
+{% capture banner_content %}{% endcapture %}
+{% capture banner_indicators %}{% endcapture %}
+{% assign slide_count = 0 %}
+{% for i in (1..5) %}
+
+  {% comment note:
+    Banner slides
+
+    - set up each slides settings variables
+    - if the slide is enabled
+      - create it's content
+      - create it's indicator
+   %}{% endcomment %}
+
+  {% assign slide = 'banner_slide_' | append: forloop.index %}
+  {% assign slide_enabled_setting = slide | append: '_enabled' %}
+  {% assign slide_image = slide | append: '.jpg' %}
+  {% assign pricing_image_enabled_setting = slide | append: '_price_enabled' %}
+  {% assign pricing_image = slide | append: '_price_img.png' %}
+  {% assign slide_title = slide | append: '_heading_text' %}
+  {% assign slide_text = slide | append: '_caption_text' %}
+  {% assign slide_button_text = slide | append: '_button_text' %}
+  {% assign slide_button_link = slide | append: '_button_link' %}
+  {% assign slide_size = slide | append: '_size' %}
+
+  {% if settings[slide_enabled_setting] %}
+
+    {% capture banner_content %}
+      {{ banner_content }}
+      <div class="item{% if slide_count == 0 %} active{% endif %}" data-slide="{{ slide_count | plus: 1 }}">
+        <div class="banner-content-wrap">
+          <figure class="banner-content">
+            <figcaption class="banner-caption {% if settings[slide_size] != 'half_container_left' and settings[slide_size] != 'half_container_right' %}carousel-caption{% endif %}">
+              {% unless settings[slide_title] == blank %}
+                <h1>{{ settings[slide_title] }}</h1>
+              {% endunless %}
+              {% unless settings[slide_text] == blank %}
+                <p>{{ settings[slide_text] }}</p>
+              {% endunless %}
+              {% unless settings[slide_button_text] == blank and settings[slide_button_link] == blank %}
+                <p><a class="call-to-action btn btn-lg" href="{{ settings[slide_button_link] }}">{{ settings[slide_button_text] }}</a></p>
+              {% endunless %}
+            </figcaption>
+            <div class="banner-image">
+              {{ slide_image | asset_url | img_tag: settings[slide_title] }}
+              {% unless settings[pricing_image_enabled_setting]  == false %}
+              <img src="{{ pricing_image | asset_url }}" class="pricing img-responsive"/>
+              {% endunless %}
+            </div>
+          </figure>
+        </div>
+      </div>
+    {% endcapture %}
+
+    {% capture banner_indicators %}
+      {{ banner_indicators }}
+      <li data-target="#{{ banner_id }}" data-slide-to="{{ slide_count }}" {% if slide_count == 0 %}class="active"{% endif %}></li>
+    {% endcapture %}
+
+    {% assign slide_count = slide_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+
+{% unless banner_content == blank %}
+<div class="banner carousel slide{% if settings.banner_transtion_type == 'fade' %} fade{% endif %}{% if settings.banner_width == 'container_width' %} sheet{% endif %}" id="{{ banner_id }}" {% if settings.banner_autoplay %}data-ride="carousel"{% endif %} data-interval="{{ settings.banner_transtion_speed }}" data-banner="1">
+  {% if slide_count > 1 %}
+  <!-- Indicators -->
+  <ol class="carousel-indicators">
+    {{ banner_indicators }}
+  </ol>
+  {% endif %}
+
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner" role="listbox">
+    {{ banner_content }}
+  </div>
+
+  {% if slide_count > 1 %}
+  <!-- Controls -->
+      <a class="left control-carousel hidden-xs" href="#{{ banner_id }}" role="button" data-slide="prev">
+        <i class="fa fa-angle-left"></i>
+      </a>
+      <a class="right control-carousel hidden-xs" href="#{{ banner_id }}" role="button" data-slide="next">
+        <i class="fa fa-angle-right"></i>
+      </a>
+  {% endif %}
+</div>
+{% endunless %}

@@ -1,0 +1,49 @@
+
+<div class="header_top"><!--header_top-->
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="contactinfo">
+          <ul class="nav nav-pills">
+            {% unless settings.social_links_phone == blank %}
+                <li><a href="#"><i class="fa fa-phone"></i>{{settings.social_links_phone}}</a></li>
+            {% endunless %}
+
+            {% unless settings.social_links_email == blank %}
+                <li><a href="mailto:{{settings.social_links_email}}"><i class="fa fa-envelope mail-top"></i> {{settings.social_links_email}}</a></li>
+            {% endunless %}
+
+
+          </ul>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        {% unless settings.top_bar_social == false %}
+        <div class="social-icons pull-right">
+          <ul class="nav navbar-nav">
+            {% unless settings.social_links_facebook == blank %}
+               <li><a href="{{settings.social_links_facebook}}"><i class="fa fa-facebook"></i></a></li>
+            {% endunless %}
+
+            {% unless settings.social_links_twitter == blank %}
+               <li><a href="{{settings.social_links_twitter}}"><i class="fa fa-twitter"></i></a></li>
+            {% endunless %}
+
+            {% unless settings.social_links_linkedin == blank %}
+               <li><a href="{{settings.social_links_linkedin}}"><i class="fa fa-linkedin"></i></a></li>
+            {% endunless %}
+
+            {% unless settings.social_links_dribbble == blank %}
+                <li><a href="{{settings.social_links_dribbble}}"><i class="fa fa-dribbble"></i></a></li>
+            {% endunless %}
+
+            {% unless settings.social_links_google_plus == blank %}
+                <li><a href="{{settings.social_links_google_plus}}"><i class="fa fa-google-plus"></i></a></li>
+            {% endunless %}
+          </ul>
+        </div>
+        {% endunless %}
+      </div>
+    </div>
+  </div>
+</div><!--/header_top-->
